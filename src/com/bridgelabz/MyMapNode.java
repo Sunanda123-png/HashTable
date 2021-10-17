@@ -10,8 +10,6 @@ public class MyMapNode<K,V> {
         this.value = value;
         next = null;
     }
-
-    //Creating getters and setters
     public K getKey() {
         return key;
     }

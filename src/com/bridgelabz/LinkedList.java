@@ -1,12 +1,28 @@
 package com.bridgelabz;
 
+import java.util.ArrayList;
+
 public class LinkedList<K,V> {
     MyMapNode head;
     MyMapNode tail;
+    private final int numOfBuckets;
+    ArrayList<MyMapNode<K, V>> myBucketArray;
 
-    // creating add method
+    public LinkedList() {
+        this.numOfBuckets = 20;
+        this.myBucketArray = new ArrayList<>();
+        for (int i = 0; i < numOfBuckets; i++)
+            this.myBucketArray.add(null);
+    }
+
     public void add(K key, V value) {
-        MyMapNode<K, V> myNewNode = (MyMapNode<K, V>) searchNode(key);
+        int index = this.getBucketIndex(key);
+        MyMapNode<K, V> myNewNode = this.myBucketArray.get(index);
+        if (myNewNode == null) {
+            myNewNode = new MyMapNode<>(key, value);
+            this.myBucketArray.set(index, myNewNode);
+        }
+        myNewNode = (MyMapNode<K, V>) searchNode(key);
         if (myNewNode == null) {
             myNewNode = new MyMapNode<>(key, value);
             this.append(myNewNode);
@@ -15,19 +31,23 @@ public class LinkedList<K,V> {
         }
     }
 
-    // Append the value in the linked list
-    public void append(MyMapNode<K, V> myNode) {
+    private int getBucketIndex(K word) {
+        int hashCode = Math.abs(word.hashCode());
+        int index = hashCode % numOfBuckets;
+        return index;
+    }
+
+    public void append(MyMapNode<K, V> myNewNode) {
         if (this.head == null)
-            this.head = myNode;
+            this.head = myNewNode;
         if (this.tail == null)
-            this.tail = myNode;
+            this.tail = myNewNode;
         else {
-            this.tail.setNext(myNode);
-            this.tail = myNode;
+            this.tail.setNext(myNewNode);
+            this.tail = myNewNode;
         }
     }
 
-    // Searching for the word in the linked list
     public MyMapNode<K, V> searchNode(K data) {
         MyMapNode<K, V> currentNode = head;
         int position = 0;
@@ -41,13 +61,15 @@ public class LinkedList<K,V> {
         return currentNode;
     }
 
-    // here we are Searching for the word and getting the value from the linked list
     public V get(K word) {
-        MyMapNode<K, V> myMapNode = searchNode(word);
-        return (myMapNode == null) ? null :myMapNode.getValue();
+        int index = this.getBucketIndex(word);
+        MyMapNode<K, V> myNewNode = this.myBucketArray.get(index);
+        if (this.myBucketArray.get(index) == null)
+            return null;
+        MyMapNode<K, V> myMapNode = (MyMapNode<K, V>) searchNode(word);
+        return (myMapNode == null) ? null : myMapNode.getValue();
     }
 
-    // Print the linked list
     @Override
     public String toString() {
         return "MyLinkedListNodes{" + head + "}";
